@@ -13,6 +13,10 @@ REFRESH_TOKEN = ENV['REFRESH_TOKEN']
 SPREADSHEET_ID = ENV['SPREADSHEET_ID']
 RANGE = 'Pockets'
 
+get '/' do
+	"What up?"
+end
+
 get '/cal/stems' do
 	drive_setup
 	cal = Icalendar::Calendar.new

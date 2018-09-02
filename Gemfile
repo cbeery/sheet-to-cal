@@ -2,6 +2,8 @@
 
 source "https://rubygems.org"
 
+ruby '2.4.2'
+
 gem 'bundler'
 gem 'google-api-client'
 gem 'signet'
