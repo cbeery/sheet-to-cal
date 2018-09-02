@@ -1,0 +1,1 @@
+Reading rows (with dates) from a Google Sheet, serving as iCalendar format.
