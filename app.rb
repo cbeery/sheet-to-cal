@@ -62,6 +62,7 @@ def convert_fluids_spreadsheet_rows_to_cal(cal)
       e.dtend       = Icalendar::Values::DateTime.new(start + 600) # Add 10 min (600 sec)
       e.summary 		= row[2] # What
       e.location		= row[1] # Where
+      e.description = start.zone
       e.uid					= "bev#{index + 1}"
     end # cal.event
 	end # @rows.each
