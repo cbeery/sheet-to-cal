@@ -10,8 +10,7 @@ GOOGLE_CLIENT_ID = ENV['GOOGLE_CLIENT_ID']
 GOOGLE_CLIENT_SECRET = ENV['GOOGLE_CLIENT_SECRET']
 REFRESH_TOKEN = ENV['REFRESH_TOKEN']
 
-SPREADSHEET_ID = ENV['SPREADSHEET_ID']
-RANGE = 'Pockets'
+# @drive.get_spreadsheet_values(sheet_id, range)
 
 get '/' do
 	"What up?"
@@ -21,10 +20,54 @@ get '/cal/stems' do
 	drive_setup
 	cal = Icalendar::Calendar.new
 	timezone_setup(cal)
-	convert_spreadsheet_rows_to_cal(cal)
+	convert_stems_spreadsheet_rows_to_cal(cal)
+end
+
+get '/cal/fluids' do
+	drive_setup
+	cal = Icalendar::Calendar.new
+	timezone_setup(cal)
+	convert_fluids_spreadsheet_rows_to_cal(cal)
 end
 
 private
+
+def convert_stems_spreadsheet_rows_to_cal(cal)
+	response = @drive.get_spreadsheet_values('1LzMYYXxTZec1FkrbCwFjHP-BSGo4fPMHvP4_TlQIq_4', 'Pockets')
+	@rows = response.values.drop(1).reverse # .drop ignores header row
+	@rows.each_with_index do |row, index|
+    cal.event do |e|
+    	date = Date.parse(row[0]) # Column A = date
+      e.dtstart     = Icalendar::Values::Date.new(date)
+      e.dtend       = Icalendar::Values::Date.new(date)
+      e.summary 		= "#{row[2]} / #{row[3]}"
+      e.location		= row[1] # Place
+      e.description = "#{row[5]} (#{row[4]})" # Notes (Activity)
+      e.uid					= "ks#{index + 1}"
+    end # cal.event
+	end # @rows.each
+	# cal.to_ical.html_safe
+	cal.to_ical.to_s
+end
+
+def convert_fluids_spreadsheet_rows_to_cal(cal)
+	# Column 1 is ISO8601 datetime format (specified in iOS Shortcuts app)
+	# DateTime.iso8601
+	response = @drive.get_spreadsheet_values('1AYNrDo43YDCcrVGY3fdf_jZJnJkgDw4skso8ewR70Ms','Fluids')
+	@rows = response.values.drop(1).reverse # .drop ignores header row
+	@rows.each_with_index do |row, index|
+    cal.event do |e|
+    	start = DateTime.iso8601(row[0]).to_time
+      e.dtstart     = Icalendar::Values::DateTime.new(start)
+      e.dtend       = Icalendar::Values::DateTime.new(start + 600) # Add 10 min (600 sec)
+      e.summary 		= row[2] # What
+      e.location		= row[1] # Where
+      e.uid					= "bev#{index + 1}"
+    end # cal.event
+	end # @rows.each
+	# cal.to_ical.html_safe
+	cal.to_ical.to_s
+end
 
 def drive_setup
 	auth = Signet::OAuth2::Client.new(
@@ -59,22 +102,4 @@ def timezone_setup(cal)
 			s.rrule        = "FREQ=YEARLY;BYMONTH=11;BYDAY=1SU"
 		end # standard
 	end # timezone
-end
-
-def convert_spreadsheet_rows_to_cal(cal)
-	response = @drive.get_spreadsheet_values(SPREADSHEET_ID, RANGE)
-	@rows = response.values.drop(1).reverse # .drop ignores header row
-	@rows.each_with_index do |row, index|
-    cal.event do |e|
-    	date = Date.parse(row[0]) # Column A = date
-      e.dtstart     = Icalendar::Values::Date.new(date)
-      e.dtend       = Icalendar::Values::Date.new(date)
-      e.summary 		= "#{row[2]} / #{row[3]}"
-      e.location		= row[1] # Place
-      e.description = "#{row[5]} (#{row[4]})" # Notes (Activity)
-      e.uid					= "ks#{index + 1}"
-    end # cal.event
-	end # @rows.each
-	# cal.to_ical.html_safe
-	cal.to_ical.to_s
 end
