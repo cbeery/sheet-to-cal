@@ -10,6 +10,12 @@ GOOGLE_CLIENT_ID = ENV['GOOGLE_CLIENT_ID']
 GOOGLE_CLIENT_SECRET = ENV['GOOGLE_CLIENT_SECRET']
 REFRESH_TOKEN = ENV['REFRESH_TOKEN']
 
+STEMS_SHEET_ID = ENV['STEMS_SHEET_ID']
+STEMS_RANGE = 'Pockets'			
+
+FLUIDS_SHEET_ID = ENV['FLUIDS_SHEET_ID']
+FLUIDS_RANGE = 'Fluids'
+
 # @drive.get_spreadsheet_values(sheet_id, range)
 
 get '/' do
@@ -33,7 +39,7 @@ end
 private
 
 def convert_stems_spreadsheet_rows_to_cal(cal)
-	response = @drive.get_spreadsheet_values('1LzMYYXxTZec1FkrbCwFjHP-BSGo4fPMHvP4_TlQIq_4', 'Pockets')
+	response = @drive.get_spreadsheet_values(STEMS_SHEET_ID, STEMS_RANGE)
 	@rows = response.values.drop(1).reverse # .drop ignores header row
 	@rows.each_with_index do |row, index|
     cal.event do |e|
@@ -53,13 +59,13 @@ end
 def convert_fluids_spreadsheet_rows_to_cal(cal)
 	# Column 1 is ISO8601 datetime format (specified in iOS Shortcuts app)
 	# DateTime.iso8601
-	response = @drive.get_spreadsheet_values('1AYNrDo43YDCcrVGY3fdf_jZJnJkgDw4skso8ewR70Ms','Fluids')
+	response = @drive.get_spreadsheet_values(FLUIDS_SHEET_ID, FLUIDS_RANGE)
 	@rows = response.values.drop(1).reverse # .drop ignores header row
 	@rows.each_with_index do |row, index|
     cal.event do |e|
     	start = DateTime.iso8601(row[0])
       e.dtstart     = Icalendar::Values::DateTime.new(start)
-      e.dtend       = Icalendar::Values::DateTime.new(start + 20.minutes)
+      e.dtend       = Icalendar::Values::DateTime.new(start + 15.minutes)
       e.summary 		= row[2] # What
       e.location		= row[1] # Where
       e.description = row[3] # Notes, if any
