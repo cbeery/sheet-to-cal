@@ -57,7 +57,7 @@ def convert_fluids_spreadsheet_rows_to_cal(cal)
 	@rows = response.values.drop(1).reverse # .drop ignores header row
 	@rows.each_with_index do |row, index|
     cal.event do |e|
-    	start = DateTime.iso8601(row[0]).to_time.localtime
+    	start = DateTime.iso8601(row[0]).in_time_zone('America/Denver').to_time
       e.dtstart     = Icalendar::Values::DateTime.new(start)
       e.dtend       = Icalendar::Values::DateTime.new(start + 600) # Add 10 min (600 sec)
       e.summary 		= row[2] # What
