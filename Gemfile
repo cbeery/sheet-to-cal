@@ -18,4 +18,4 @@ gem 'icalendar'
 # https://github.com/cbeery/sheet-to-cal/network/alert/Gemfile.lock/rack/open
 # https://nvd.nist.gov/vuln/detail/CVE-2018-16471
 # https://nvd.nist.gov/vuln/detail/CVE-2018-16470
-gem 'rack', '>= 2.0.6'
+gem 'rack', '>= 2.0.8'
