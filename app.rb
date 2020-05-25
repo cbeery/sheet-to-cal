@@ -5,10 +5,13 @@ require 'google/apis/sheets_v4'
 require 'signet/oauth_2/client'
 require 'dotenv/load'
 require 'icalendar'
+require 'net/http'
 
 GOOGLE_CLIENT_ID = ENV['GOOGLE_CLIENT_ID']
 GOOGLE_CLIENT_SECRET = ENV['GOOGLE_CLIENT_SECRET']
 REFRESH_TOKEN = ENV['REFRESH_TOKEN']
+
+AIRTABLE_API_KEY = ENV['AIRTABLE_API_KEY']
 
 STEMS_SHEET_ID = ENV['STEMS_SHEET_ID']
 STEMS_RANGE = 'Pockets'			
@@ -34,6 +37,12 @@ get '/cal/fluids' do
 	cal = Icalendar::Calendar.new
 	timezone_setup(cal)
 	convert_fluids_spreadsheet_rows_to_cal(cal)
+end
+
+get '/cal/steam' do
+	cal = Icalendar::Calendar.new
+	timezone_setup(cal)
+	convert_steam_airtable_outfits_to_cal(cal)
 end
 
 private
@@ -109,4 +118,39 @@ def timezone_setup(cal)
 			s.rrule        = "FREQ=YEARLY;BYMONTH=11;BYDAY=1SU"
 		end # standard
 	end # timezone
+end
+
+def convert_steam_airtable_outfits_to_cal(cal)
+	url = 'https://api.airtable.com/v0/appCdpOEVQYmo995T/Outfits'
+	uri = URI(url)
+	params = {view: 'iCal', api_key: AIRTABLE_API_KEY}
+	uri.query = URI.encode_www_form(params)
+	results = JSON.parse(Net::HTTP.get(uri))
+
+	process_steam_rows(results, cal)
+
+	while results['offset'] do
+		params[:offset] = results['offset']
+
+		uri.query = URI.encode_www_form(params)
+		results = JSON.parse(Net::HTTP.get(uri))
+
+		process_steam_rows(results, cal)
+		
+	end
+	cal.to_ical.to_s
+end
+
+def process_steam_rows(results, cal)
+	results['records'].each do |record|
+    cal.event do |e|
+    	outfit_date = Icalendar::Values::Date.new(record['fields']['Date'].to_date)
+      e.dtstart     = outfit_date
+      e.dtend       = outfit_date
+      e.summary 		= record['fields']['Shorts-Socks-Shoes']
+      e.location		= record['fields']['Locale Text']
+      e.description = "#{record['fields']['Venues Text']}\n#{record['fields']['Notes']}" 
+      e.uid					= record['id']
+    end # cal.event
+	end
 end
