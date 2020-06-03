@@ -144,9 +144,10 @@ end
 def process_steam_rows(results, cal)
 	results['records'].each do |record|
     cal.event do |e|
-    	outfit_date 	= Icalendar::Values::Date.new(record['fields']['Date'].to_date)
-      e.dtstart     = outfit_date
-      e.dtend       = outfit_date
+    	outfit_date 	= Date.parse(record['fields']['Date'])
+    	outfit_ical_date 	= Icalendar::Values::Date.new(outfit_date)
+      e.dtstart     = outfit_ical_date
+      e.dtend       = outfit_ical_date
       e.summary 		= record['fields']['Shorts-Socks-Shoes']
       e.location		= record['fields']['Locale Text']
       e.description = "#{record['fields']['Venues Text']}\n#{record['fields']['Notes']}" 
