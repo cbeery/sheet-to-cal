@@ -129,15 +129,15 @@ def convert_steam_airtable_outfits_to_cal(cal)
 
 	process_steam_rows(results, cal)
 
-	while results['offset'] do
-		params[:offset] = results['offset']
+	# while results['offset'] do
+	# 	params[:offset] = results['offset']
 
-		uri.query = URI.encode_www_form(params)
-		results = JSON.parse(Net::HTTP.get(uri))
+	# 	uri.query = URI.encode_www_form(params)
+	# 	results = JSON.parse(Net::HTTP.get(uri))
 
-		process_steam_rows(results, cal)
+	# 	process_steam_rows(results, cal)
 		
-	end
+	# end
 	cal.to_ical.to_s
 end
 
