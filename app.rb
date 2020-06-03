@@ -139,12 +139,13 @@ def convert_steam_airtable_outfits_to_cal(cal)
 		
 	# end
 	cal.to_ical.to_s
+	results
 end
 
 def process_steam_rows(results, cal)
 	results['records'].each do |record|
     cal.event do |e|
-    	outfit_date = Icalendar::Values::Date.new(record['fields']['Date'].to_date)
+    	outfit_date 	= Icalendar::Values::Date.new(record['fields']['Date'].to_date)
       e.dtstart     = outfit_date
       e.dtend       = outfit_date
       e.summary 		= record['fields']['Shorts-Socks-Shoes']
