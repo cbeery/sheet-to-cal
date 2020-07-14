@@ -72,9 +72,11 @@ def convert_fluids_spreadsheet_rows_to_cal(cal)
 	@rows = response.values.drop(1).reverse # .drop ignores header row
 	@rows.each_with_index do |row, index|
     cal.event do |e|
-    	start = DateTime.iso8601(row[0])
+    	puts row[0]
+    	# start = DateTime.iso8601(row[0])
+    	start = DateTime.parse(row[0]).to_time
       e.dtstart     = Icalendar::Values::DateTime.new(start)
-      e.dtend       = Icalendar::Values::DateTime.new(start + 15.minutes)
+      e.dtend       = Icalendar::Values::DateTime.new(start + (15 * 60)) # 15 minutes
       e.summary 		= row[2] # What
       e.location		= row[1] # Where
       e.description = row[3] # Notes, if any
