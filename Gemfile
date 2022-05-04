@@ -14,6 +14,7 @@ gem 'sinatra-partial'
 gem 'dotenv'
 gem 'icalendar'
 
+gem 'activesupport', '~> 6.1'
 # https://github.com/cbeery/sheet-to-cal/network/alert/Gemfile.lock/rack/open
 # https://nvd.nist.gov/vuln/detail/CVE-2018-16471
 # https://nvd.nist.gov/vuln/detail/CVE-2018-16470
