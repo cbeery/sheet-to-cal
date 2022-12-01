@@ -8,7 +8,7 @@ gem 'bundler'
 gem 'google-api-client'
 gem 'signet'
 
-gem 'sinatra', '~> 2.2.0'
+gem 'sinatra', '~> 3.0.4'
 gem 'sinatra-contrib'
 gem 'sinatra-partial'
 gem 'dotenv'
